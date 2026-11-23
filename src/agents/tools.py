@@ -97,7 +97,7 @@ def search_seller_items_tool(
     data = client.search_seller_items(user_id, status=status, limit=limit)
     ids = data.get("results") or []
     if not ids:
-        return json.dumps({"user_id": user_id, "total": 0, round"items": []}, ensure_ascii=False)
+        return json.dumps({"user_id": user_id, "total": 0, "items": []}, ensure_ascii=False)
 
     items = client.get_items(ids[:limit])
     summarized = [_summarize_item(i) for i in items]
