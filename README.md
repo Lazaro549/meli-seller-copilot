@@ -4,7 +4,8 @@ AI-powered copilot for Mercado Libre sellers.
 
 Helps sellers with product analysis, pricing recommendations, competitive intelligence and actionable insights using LLMs + Mercado Libre API.
 
-> **Status:** Private · Early development
+> **Status:** Private · Early development  
+> **License:** [MIT](LICENSE)
 
 ---
 
@@ -38,6 +39,7 @@ meli-seller-copilot/
 │   └── analysis/              # (next: pure analysis logic)
 ├── .env.example
 ├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
@@ -140,6 +142,12 @@ tokens = client.exchange_code("THE_CODE")
 - Prefer simple, working solutions over complex ones
 - Keep seller value as the main success metric
 - No invented numbers — the agent must use tool data
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE).
 
 ---
 
