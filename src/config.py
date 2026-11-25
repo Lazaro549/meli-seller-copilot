@@ -28,11 +28,35 @@ class Settings(BaseSettings):
         description="Default site (Argentina = MLA)",
     )
 
+    # LLM provider: anthropic | openai | groq | mock
+    llm_provider: Literal["anthropic", "openai", "groq", "mock"] = Field(
+        default="anthropic",
+        description="Which LLM backend to use. 'mock' skips the LLM and builds a template report.",
+    )
+
     # Anthropic / Claude
     anthropic_api_key: str = Field(default="", description="Anthropic API key")
     anthropic_model: str = Field(
         default="claude-sonnet-4-20250514",
         description="Claude model to use for agents",
+    )
+
+    # OpenAI
+    openai_api_key: str = Field(default="", description="OpenAI API key")
+    openai_model: str = Field(
+        default="gpt-4o-mini",
+        description="OpenAI model",
+    )
+
+    # Groq (OpenAI-compatible)
+    groq_api_key: str = Field(default="", description="Groq API key")
+    groq_model: str = Field(
+        default="llama-3.3-70b-versatile",
+        description="Groq model",
+    )
+    groq_base_url: str = Field(
+        default="https://api.groq.com/openai/v1",
+        description="Groq OpenAI-compatible base URL",
     )
 
     # App
