@@ -5,8 +5,9 @@ AI-powered copilot for Mercado Libre sellers.
 
 Helps sellers with product analysis, pricing recommendations, competitive intelligence and actionable insights using LLMs + Mercado Libre API.
 
-> **Status:** Private · Early development  
-> **License:** [MIT](LICENSE)
+> **Status:** Public · Early development  
+> **License:** [MIT](LICENSE)  
+> **Website:** [Portfolio](https://lazaro549.github.io/Portfolio/)
 
 ---
 
@@ -147,6 +148,18 @@ except AgentError as e:
 - Prefer simple, working solutions over complex ones
 - Keep seller value as the main success metric
 - No invented numbers — the agent must use tool data
+
+---
+
+## 💸 Donations
+
+If you'd like to support this project:
+
+**🇦🇷 ARS (Argentina)**  
+Alias: `lazaro.503.alaba.mp`
+
+**🌎 USD (Argentina only, local transfers)**  
+Alias: `ahogada.duras.foca`
 
 ---
 
