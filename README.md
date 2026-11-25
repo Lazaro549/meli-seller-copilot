@@ -1,4 +1,5 @@
 # meli-seller-copilot
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/58e4d703-59b8-439e-86a3-cf87bb8c664e" />
 
 AI-powered copilot for Mercado Libre sellers.
 
