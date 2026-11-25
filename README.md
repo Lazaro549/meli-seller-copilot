@@ -5,9 +5,7 @@ AI-powered copilot for Mercado Libre sellers.
 
 Helps sellers with product analysis, pricing recommendations, competitive intelligence and actionable insights using LLMs + Mercado Libre API.
 
-> **Status:** Public · Early development  
-> **License:** [MIT](LICENSE)  
-> **Website:** [Portfolio](https://lazaro549.github.io/Portfolio/)
+
 
 ---
 
