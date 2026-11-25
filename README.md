@@ -27,16 +27,17 @@ Focus: **useful > fancy**. Measure results.
 ```
 meli-seller-copilot/
 ├── src/
-│   ├── config.py              # Settings (pydantic-settings)
-│   ├── cli.py                 # CLI entrypoint
+│   ├── config.py                 # Settings (pydantic-settings)
+│   ├── cli.py                    # CLI entrypoint
 │   ├── meli/
-│   │   ├── client.py          # MeliClient (OAuth + items + search)
-│   │   └── __init__.py
+│   │   └── client.py             # MeliClient (OAuth + items + search)
 │   ├── agents/
-│   │   ├── product_analyst.py # First agent (Claude + tools)
-│   │   ├── tools.py           # Tool implementations
-│   │   └── __init__.py
-│   └── analysis/              # (next: pure analysis logic)
+│   │   ├── product_analyst.py    # Agent principal
+│   │   ├── llm.py                # Multi-LLM (Anthropic / OpenAI / Groq)
+│   │   ├── mock_report.py        # Reporte offline sin LLM
+│   │   ├── errors.py             # Errores amigables
+│   │   └── tools.py              # Tools MeLi
+│   └── analysis/                 # (próximo: pricing determinístico)
 ├── .env.example
 ├── requirements.txt
 ├── LICENSE
@@ -47,79 +48,79 @@ meli-seller-copilot/
 
 | Component | Description |
 |-----------|-------------|
-| **MeliClient** | OAuth 2.0 (auth code + refresh), `get_item`, `search`, `search_seller_items`, `get_user` |
-| **ProductAnalyst** | Agent with tool-use loop (Claude). Tools: `get_item`, `search_competitors` |
-| **Tools** | Thin wrappers that return compact JSON suitable for the LLM |
+| **MeliClient** | OAuth 2.0, `get_item`, `search`, `search_seller_items`, `get_user` |
+| **ProductAnalyst** | Agent con tools + multi-LLM o modo mock |
+| **LLMClient** | Anthropic / OpenAI / Groq con tool-use loop |
+| **Mock report** | Datos reales de MeLi + plantilla (sin gastar créditos) |
 
 ---
 
 ## Setup
 
 ```bash
-# 1. Clone & install
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-# 2. Configure
 cp .env.example .env
-# Edit .env with your keys
 ```
 
-### Required environment variables
+### Variables de entorno relevantes
 
 ```env
-MELI_CLIENT_ID=          # from DevCenter
-MELI_CLIENT_SECRET=
-MELI_ACCESS_TOKEN=       # optional if you already have one
-MELI_REFRESH_TOKEN=      # recommended
-MELI_SITE_ID=MLA
+LLM_PROVIDER=mock          # anthropic | openai | groq | mock
 
 ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=claude-sonnet-4-20250514
+OPENAI_API_KEY=
+GROQ_API_KEY=              # recomendado para desarrollo (barato/gratis)
+
+MELI_SITE_ID=MLA
 ```
+
+Por defecto en `.env.example` está `LLM_PROVIDER=mock` para que puedas probar sin créditos.
 
 ---
 
 ## Usage
 
-### CLI (Product Analyst)
+### Modo mock (sin LLM, recomendado si no hay créditos)
 
 ```bash
-# Analyze a specific listing
-python -m src.cli --item MLA1234567890
-
-# Analyze by search query
-python -m src.cli --query "auriculares bluetooth noise cancelling"
-
-# With extra seller context
-python -m src.cli --item MLA1234567890 --context "Costo de reposición: $18000. Quiero margen mínimo 25%."
+python -m src.cli --query "auriculares bluetooth" --mock
+python -m src.cli --item MLA1234567890 --mock
 ```
+
+Usa la API pública de Mercado Libre y genera un reporte estructurado determinístico.
+
+### Con LLM
+
+```bash
+# Anthropic
+LLM_PROVIDER=anthropic python -m src.cli --query "auriculares bluetooth"
+
+# Groq
+python -m src.cli --query "auriculares bluetooth" --provider groq
+
+# OpenAI
+python -m src.cli --item MLA1234567890 --provider openai
+
+# Con contexto del vendedor
+python -m src.cli --item MLA1234567890 --context "Costo $18000, margen mínimo 25%"
+```
+
+### Errores amigables
+
+Si el proveedor falla por créditos, auth o rate limit, el CLI muestra un mensaje claro + sugerencia (por ejemplo cambiar a `--mock` o cargar créditos), en lugar de un traceback largo.
 
 ### Programmatic
 
 ```python
-from src.meli import MeliClient
-from src.agents import ProductAnalyst
+from src.agents import ProductAnalyst, AgentError
 
-client = MeliClient()
-agent = ProductAnalyst(meli_client=client)
-
-report = agent.analyze(item_id="MLA1234567890")
-print(report)
-```
-
-### OAuth (manual flow for now)
-
-```python
-from src.meli import MeliClient
-
-client = MeliClient()
-print(client.authorization_url(state="random-csrf-token"))
-# → open URL, authorize, get ?code=...
-
-tokens = client.exchange_code("THE_CODE")
-# tokens["access_token"], tokens["refresh_token"], tokens["user_id"]
+agent = ProductAnalyst(provider_override="mock")
+try:
+    print(agent.analyze(query="auriculares bluetooth"))
+except AgentError as e:
+    print(e.format_for_user())
 ```
 
 ---
@@ -127,11 +128,14 @@ tokens = client.exchange_code("THE_CODE")
 ## Roadmap (short term)
 
 - [x] MeliClient with OAuth + core resources
-- [x] ProductAnalyst agent (first agent)
+- [x] ProductAnalyst agent
+- [x] Friendly API/LLM errors
+- [x] Mock / offline mode
+- [x] Multi-LLM (Anthropic, OpenAI, Groq)
 - [ ] Persist tokens securely
 - [ ] Pricing / profitability pure functions in `analysis/`
 - [ ] Seller items overview agent
-- [ ] FastAPI thin layer + simple auth callback
+- [ ] FastAPI + OAuth callback
 - [ ] Basic evaluation (latency, token cost, usefulness)
 
 ---
