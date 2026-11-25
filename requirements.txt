@@ -7,6 +7,7 @@ pydantic-settings>=2.6.0
 
 # LLM
 anthropic>=0.39.0
+openai>=1.54.0
 # boto3>=1.35.0  # Uncomment if using Amazon Bedrock
 
 # Data & analysis
